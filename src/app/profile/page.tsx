@@ -48,6 +48,19 @@ export default function ProfilePage() {
     }
   }
 
+  async function disconnectX() {
+    if (!confirm("Disconnect your X account from this profile?")) return;
+    await fetch("/api/profile/x", { method: "DELETE" });
+    await refresh();
+  }
+
+  async function disconnectCosmos() {
+    if (!confirm("Disconnect your Cosmos wallet? You can reconnect anytime.")) return;
+    await fetch("/api/profile/cosmos", { method: "DELETE" });
+    localStorage.removeItem("cfp_cosmos_provider");
+    await refresh();
+  }
+
   if (loading) return <p className="muted">Loading…</p>;
   if (!me)
     return (
@@ -73,7 +86,9 @@ export default function ProfilePage() {
             <div>{me.xUsername ? `@${me.xUsername}` : "No X linked yet"}</div>
             <div className="muted mono">{me.evmAddress}</div>
           </div>
-          {!me.xUsername && (
+          {me.xUsername ? (
+            <button className="btn secondary" onClick={disconnectX}>Disconnect X</button>
+          ) : (
             <a className="btn secondary" href="/api/auth/x/start">Link X</a>
           )}
         </div>
@@ -82,7 +97,12 @@ export default function ProfilePage() {
       <div className="card">
         <h2>Cosmos Hub address</h2>
         {me.cosmosAddress ? (
-          <p className="mono">{me.cosmosAddress}</p>
+          <div className="spread">
+            <p className="mono" style={{ margin: 0, wordBreak: "break-all" }}>{me.cosmosAddress}</p>
+            <button className="btn secondary" onClick={disconnectCosmos} style={{ flexShrink: 0 }}>
+              Disconnect
+            </button>
+          </div>
         ) : (
           <>
             <p className="muted">

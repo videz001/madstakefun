@@ -65,6 +65,20 @@ export const store = {
     });
   },
 
+  async clearCosmosAddress(evmAddress: string): Promise<User> {
+    return prisma.user.update({
+      where: { evmAddress: evmAddress.toLowerCase() },
+      data: { cosmosAddress: null },
+    });
+  },
+
+  async clearXProfile(evmAddress: string): Promise<User> {
+    return prisma.user.update({
+      where: { evmAddress: evmAddress.toLowerCase() },
+      data: { xUserId: null, xUsername: null, xAvatarUrl: null },
+    });
+  },
+
   async allUsers(): Promise<User[]> {
     return prisma.user.findMany();
   },
