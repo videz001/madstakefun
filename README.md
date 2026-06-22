@@ -1,11 +1,8 @@
-# Cosmos Fast Pass
+# Mad Stake Fun
 
-Turn an EVM wallet into a Cosmos profile. Connect MetaMask/Rabby → sign in → get a
-real Cosmos Hub address via the Leap MetaMask Snap → (fund → stake) → leaderboard.
+Connect any EVM wallet eg: MetaMask/Rabby → sign in → get a Keplr wallet
+obtain the Cosmos Hub address → get some ATOM → stake → leaderboard.
 
-This is a **hackathon skeleton**: EVM auth, Snap-based Cosmos address, and a live
-leaderboard are wired up. Funding (Skip:Go) and staking (CosmJS) are stubbed with
-clear hook points.
 
 ## Run
 
