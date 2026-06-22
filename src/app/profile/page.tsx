@@ -16,7 +16,6 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<CosmosProvider | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [detected, setDetected] = useState({ keplr: false, leap: false });
 
   async function refresh() {
     const res = await fetch("/api/auth/me");
@@ -26,10 +25,6 @@ export default function ProfilePage() {
   }
   useEffect(() => {
     refresh();
-    setDetected({
-      keplr: !!(window as any).keplr,
-      leap: !!(window as any).leap,
-    });
   }, []);
 
   async function createCosmosProfile(provider: CosmosProvider) {
@@ -91,35 +86,24 @@ export default function ProfilePage() {
         ) : (
           <>
             <p className="muted">
-              Install a Cosmos browser wallet, then connect it to mint your Cosmos
-              Hub account. This is the address you'll fund and stake from — you only
-              approve popups, you never enter a seed phrase here.
+              Connect a Cosmos browser wallet to mint your Cosmos Hub account. You
+              only approve popups — you never enter a seed phrase here.
             </p>
             <div className="row">
-              {detected.keplr ? (
-                <button className="btn" onClick={() => createCosmosProfile("keplr")} disabled={!!busy}>
-                  {busy === "keplr" ? "Connecting Keplr…" : "Connect Keplr"}
-                </button>
-              ) : (
-                <a className="btn" href="https://www.keplr.app/download" target="_blank" rel="noreferrer">
-                  Install Keplr ↗
-                </a>
-              )}
-              {detected.leap ? (
-                <button className="btn secondary" onClick={() => createCosmosProfile("leap")} disabled={!!busy}>
-                  {busy === "leap" ? "Connecting Leap…" : "Connect Leap"}
-                </button>
-              ) : (
-                <a className="btn secondary" href="https://www.leapwallet.io/download" target="_blank" rel="noreferrer">
-                  Install Leap ↗
-                </a>
-              )}
+              <button className="btn" onClick={() => createCosmosProfile("keplr")} disabled={!!busy}>
+                {busy === "keplr" ? "Connecting Keplr…" : "Connect Keplr"}
+              </button>
+              <button className="btn secondary" onClick={() => createCosmosProfile("leap")} disabled={!!busy}>
+                {busy === "leap" ? "Connecting Leap…" : "Connect Leap"}
+              </button>
             </div>
-            {!detected.keplr && !detected.leap && (
-              <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>
-                After installing, refresh this page and a Connect button appears.
-              </p>
-            )}
+            <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>
+              Don&apos;t have one? Install{" "}
+              <a href="https://www.keplr.app/download" target="_blank" rel="noreferrer" style={{ color: "var(--acid)" }}>Keplr</a>{" "}
+              or{" "}
+              <a href="https://www.leapwallet.io/download" target="_blank" rel="noreferrer" style={{ color: "var(--acid)" }}>Leap</a>,
+              then reload this page and connect.
+            </p>
             <details style={{ marginTop: 14 }}>
               <summary className="muted" style={{ cursor: "pointer", fontSize: 12 }}>
                 Advanced: use the MetaMask Snap instead (EVM-only, needs Flask if not allowlisted)
