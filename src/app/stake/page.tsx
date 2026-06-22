@@ -30,7 +30,7 @@ export default function StakePage() {
         setRank(row?.rank ?? null);
       })
       .catch(() => {});
-    setCardKey((k) => k + 1);
+    setCardKey(Date.now()); // unique per fetch so the browser never serves a stale card
   }
 
   async function refresh() {
