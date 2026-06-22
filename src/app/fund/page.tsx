@@ -39,7 +39,7 @@ export default function FundPage() {
 
   return (
     <main>
-      <h1>Fund with ATOM</h1>
+      <h1>Get some ATOM</h1>
       <p className="muted">
         Route a small amount of any supported EVM asset into ATOM on Cosmos Hub.
       </p>

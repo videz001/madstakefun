@@ -75,6 +75,9 @@ export function SkipFundWidget({
       const el = ref.current;
       if (!el) return;
       el.theme = widgetTheme;
+      // Route Skip's API calls through our own backend proxy to avoid CORS
+      // (go.skip.build's API is locked to Skip's own origin).
+      el.apiUrl = `${window.location.origin}/api/skip`;
       el.defaultRoute = { destChainId: CHAIN_ID, destAssetDenom: "uatom" };
       const connected: Record<string, string> = { [CHAIN_ID]: cosmosAddress };
       if (evmAddress) connected["1"] = evmAddress;

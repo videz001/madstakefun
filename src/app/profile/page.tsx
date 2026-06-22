@@ -145,7 +145,7 @@ export default function ProfilePage() {
         <div className="row">
           {me.cosmosAddress && (
             <>
-              <Link className="btn" href="/fund">Fund with ATOM →</Link>
+              <Link className="btn" href="/fund">Get some ATOM →</Link>
               <Link className="btn secondary" href="/stake">Stake</Link>
             </>
           )}
