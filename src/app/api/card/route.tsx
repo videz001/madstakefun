@@ -31,11 +31,16 @@ async function loadBgDataUri(): Promise<string> {
 export async function GET(req: NextRequest) {
   const address = req.nextUrl.searchParams.get("address");
   const download = req.nextUrl.searchParams.get("download");
+  const p = req.nextUrl.searchParams.get("period");
+  const period = p === "month" || p === "all" ? p : "week";
   if (!address) return new Response("address required", { status: 400 });
 
   // Fresh read so a just-made stake shows immediately (no stale cache).
-  const rows = await buildLeaderboard("week", { noCache: true });
+  const rows = await buildLeaderboard(period, { noCache: true });
   const me = rows.find((r) => r.cosmosAddress === address) || null;
+
+  const label =
+    period === "all" ? "ATOM staked all-time" : period === "month" ? "ATOM staked this month" : "ATOM staked this week";
 
   const rank = me?.rank ?? null;
   const atom = me?.periodAtom ?? 0;
@@ -151,7 +156,7 @@ export async function GET(req: NextRequest) {
                 {atomStr}
               </div>
               <div style={{ fontSize: 38, marginLeft: 16, color: "#9aa3b2", paddingBottom: 8 }}>
-                ATOM staked this week
+                {label}
               </div>
             </div>
           </div>

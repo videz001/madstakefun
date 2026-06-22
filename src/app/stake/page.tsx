@@ -16,18 +16,21 @@ export default function StakePage() {
   const [loading, setLoading] = useState(true);
   const [balance, setBalance] = useState<number | null>(null);
   const [delegated, setDelegated] = useState<number | null>(null);
-  const [rank, setRank] = useState<number | null>(null);
-  const [cardKey, setCardKey] = useState(0); // bumps to refresh the card image
+  const [weekRow, setWeekRow] = useState<any>(null);
+  const [allRow, setAllRow] = useState<any>(null);
+  const [cardKey, setCardKey] = useState(0); // bumps to refresh the card images
 
   async function loadChain(addr: string) {
     getAtomBalance(addr).then(setBalance).catch(() => {});
     getDelegatedAtom(addr).then(setDelegated).catch(() => {});
-    // find rank from the leaderboard
-    fetch("/api/leaderboard")
-      .then((r) => r.json())
-      .then((d) => {
-        const row = (d.rows || []).find((x: any) => x.cosmosAddress === addr);
-        setRank(row?.rank ?? null);
+    // find this user's row on the weekly + all-time boards
+    Promise.all([
+      fetch("/api/leaderboard?period=week").then((r) => r.json()),
+      fetch("/api/leaderboard?period=all").then((r) => r.json()),
+    ])
+      .then(([w, a]) => {
+        setWeekRow((w.rows || []).find((x: any) => x.cosmosAddress === addr) || null);
+        setAllRow((a.rows || []).find((x: any) => x.cosmosAddress === addr) || null);
       })
       .catch(() => {});
     setCardKey(Date.now()); // unique per fetch so the browser never serves a stale card
@@ -55,15 +58,18 @@ export default function StakePage() {
     );
   }
 
-  const cardUrl = `/api/card?address=${encodeURIComponent(me.cosmosAddress)}&v=${cardKey}`;
-  const downloadUrl = `/api/card?address=${encodeURIComponent(me.cosmosAddress)}&download=1`;
-  const shareText =
-    `I just staked ${delegated?.toFixed(2) ?? ""} ATOM on Cosmos Hub` +
-    (rank ? ` and I'm ranked #${rank}` : "") +
-    ` on the Cosmos Fast Pass leaderboard! ⚛️\n\nTurn your EVM wallet into a Cosmos profile and climb 👇`;
-  const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
-
+  const addr = encodeURIComponent(me.cosmosAddress);
   const staked = (delegated ?? 0) > 0;
+
+  function shareUrlFor(period: "week" | "all", row: any) {
+    const when = period === "all" ? "all-time" : "this week";
+    const amt = row?.periodAtom != null ? row.periodAtom.toFixed(2) : "0";
+    const text =
+      `I've staked ${amt} ATOM ${when} on Cosmos Hub` +
+      (row?.rank ? ` and I'm ranked #${row.rank} ${when}` : "") +
+      ` on MAD STAKE FUN! ⚛️\n\nOne click from EVM into Cosmos — climb the board 👇`;
+    return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  }
 
   return (
     <main>
@@ -93,26 +99,37 @@ export default function StakePage() {
         <div className="card lit">
           <h2>Share your rank</h2>
           <p className="muted" style={{ marginTop: 0 }}>
-            Show off your Cosmos debut and bring more EVM users on-chain.
+            Post the weekly card to compete, or the all-time card to flex your total.
           </p>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            key={cardKey}
-            src={cardUrl}
-            alt="Your Cosmos Fast Pass rank card"
-            style={{ width: "100%", borderRadius: 12, border: "1px solid var(--border)" }}
-          />
-          <div className="row" style={{ marginTop: 14 }}>
-            <a className="btn" href={shareUrl} target="_blank" rel="noreferrer">
-              Share on X
-            </a>
-            <a className="btn secondary" href={downloadUrl} download>
-              Download card
-            </a>
+          <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+            {[
+              { period: "week" as const, title: "This week", row: weekRow },
+              { period: "all" as const, title: "All time", row: allRow },
+            ].map(({ period, title, row }) => (
+              <div key={period} style={{ flex: "1 1 300px", minWidth: 0 }}>
+                <div className="spread" style={{ margin: "0 0 8px" }}>
+                  <span style={{ textTransform: "uppercase", letterSpacing: "0.1em", fontSize: 12, fontWeight: 700 }}>{title}</span>
+                  <span className="pill on">
+                    {row ? `#${row.rank} · ${row.periodAtom.toFixed(2)} ATOM` : "unranked"}
+                  </span>
+                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  key={`${period}-${cardKey}`}
+                  src={`/api/card?address=${addr}&period=${period}&v=${cardKey}`}
+                  alt={`${title} rank card`}
+                  style={{ width: "100%", borderRadius: 12, border: "1px solid var(--border)" }}
+                />
+                <div className="row" style={{ marginTop: 10 }}>
+                  <a className="btn" href={shareUrlFor(period, row)} target="_blank" rel="noreferrer">Share on X</a>
+                  <a className="btn secondary" href={`/api/card?address=${addr}&period=${period}&download=1`} download>Download</a>
+                </div>
+              </div>
+            ))}
           </div>
           {!me.xUsername && (
-            <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>
-              Tip: link your X on the profile page to put your avatar and handle on the card.
+            <p className="muted" style={{ fontSize: 12, marginTop: 12 }}>
+              Tip: link your X on the profile page to put your avatar and handle on the cards.
             </p>
           )}
         </div>
