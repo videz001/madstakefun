@@ -35,9 +35,8 @@ export default function Home() {
         One click from EVM into <span className="accent">Cosmos</span>
       </h1>
       <p className="muted" style={{ maxWidth: 560 }}>
-        No seed phrase. No private keys collected. Connect MetaMask or Rabby, add a
-        Cosmos wallet (Keplr or Leap), swap any EVM asset into ATOM, stake, and climb
-        the public leaderboard.
+        Connect MetaMask or Rabby, add a Cosmos wallet (Keplr or Leap), swap any EVM
+        asset into ATOM, stake, and climb the public leaderboard.
       </p>
 
       <div className="card lit">

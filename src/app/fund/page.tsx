@@ -41,7 +41,8 @@ export default function FundPage() {
     <main>
       <h1>Get some ATOM</h1>
       <p className="muted">
-        Route a small amount of any supported EVM asset into ATOM on Cosmos Hub.
+        Swap a small amount of any supported EVM asset into ATOM on Cosmos Hub. Or
+        send some ATOM from a CEX to your Cosmos address shown below.
       </p>
 
       <div className="card">
