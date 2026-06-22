@@ -1,0 +1,51 @@
+// Postgres schema for Cosmos Fast Pass.
+// Apply: `npm run db:push` (quick) or `npm run db:migrate` (versioned migrations).
+//
+// Kept lean for the MVP: one User row holds the EVM identity, the derived/Snap
+// Cosmos address, and the linked X profile. Split into wallet_accounts /
+// x_accounts later if you need multiple wallets or token retention.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // pooled (transaction mode, port 6543) — app runtime
+  directUrl = env("DIRECT_URL") // direct (session mode, port 5432) — migrations / db push
+}
+
+model User {
+  id            String   @id @default(uuid())
+  evmAddress    String   @unique // lowercased 0x...
+  cosmosAddress String? // cosmos1... from the Leap Snap
+  xUserId       String? // X provider user id
+  xUsername     String?
+  xAvatarUrl    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([cosmosAddress])
+}
+
+// Short-lived sign-in nonces (one per EVM address).
+model Nonce {
+  evmAddress String   @id
+  value      String
+  createdAt  DateTime @default(now())
+}
+
+// One row per delegation made through the app. Used to rank the weekly
+// leaderboard by ATOM staked within the current Mon–Sun (ET) window.
+model StakeEvent {
+  id               String   @id @default(uuid())
+  userId           String
+  cosmosAddress    String
+  validatorAddress String
+  amount           Float // ATOM delegated in this tx (verified on-chain)
+  txHash           String   @unique // prevents double-counting the same tx
+  createdAt        DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}

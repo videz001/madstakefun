@@ -1,0 +1,160 @@
+/* Cosmos Fast Pass — "mad science lab" theme
+   (inspired by the Mad Easy on Cosmos hackathon look:
+    dark lab background, acid-green accent, uppercase display type,
+    monospace labels, numbered cards, scrolling ticker, soft glow). */
+
+:root {
+  --bg: #07080b;
+  --bg2: #0b0d12;
+  --panel: #0e1118;
+  --panel2: #11151d;
+  --border: #1c2230;
+  --border2: #2a3344;
+  --text: #e9edf2;
+  --muted: #7e8798;
+  --acid: #b6ff3a;      /* primary lab green */
+  --acid-dim: #8fd61f;
+  --violet: #7c6cff;
+  --danger: #ff6b6b;
+  --glow: rgba(182, 255, 58, 0.35);
+}
+
+* { box-sizing: border-box; }
+
+html, body { padding: 0; margin: 0; }
+
+body {
+  background:
+    radial-gradient(900px 500px at 80% -10%, rgba(124, 108, 255, 0.12), transparent 60%),
+    radial-gradient(700px 500px at -10% 0%, rgba(182, 255, 58, 0.08), transparent 55%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  min-height: 100vh;
+}
+
+/* faint lab grid overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 44px 44px;
+  z-index: 0;
+}
+
+a { color: inherit; }
+.container { max-width: 820px; margin: 0 auto; padding: 28px 20px 90px; position: relative; z-index: 1; }
+
+/* ---- nav ---- */
+nav.top {
+  display: flex; gap: 22px; align-items: center;
+  padding: 16px 22px; border-bottom: 1px solid var(--border);
+  background: rgba(7, 8, 11, 0.7); backdrop-filter: blur(8px);
+  position: sticky; top: 0; z-index: 5;
+}
+nav.top a {
+  text-decoration: none; color: var(--muted);
+  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600;
+}
+nav.top a:hover { color: var(--acid); }
+nav.top .brand {
+  font-weight: 800; color: var(--text); margin-right: auto;
+  letter-spacing: 0.16em; font-size: 13px;
+}
+nav.top .brand::before { content: "⚗ "; color: var(--acid); }
+
+/* ---- ticker ---- */
+.ticker {
+  overflow: hidden; white-space: nowrap;
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  background: var(--acid); color: #07080b; position: relative; z-index: 1;
+}
+.ticker__track {
+  display: inline-block; padding: 7px 0;
+  animation: scroll 22s linear infinite;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.18em;
+}
+.ticker__track span { padding: 0 22px; }
+@keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ---- type ---- */
+h1 {
+  font-size: 40px; line-height: 1.02; margin: 18px 0 10px;
+  font-weight: 800; letter-spacing: -0.02em;
+}
+h1 .accent { color: var(--acid); }
+h2 {
+  font-size: 13px; text-transform: uppercase; letter-spacing: 0.16em;
+  color: var(--muted); font-weight: 700; margin: 0 0 14px;
+}
+.eyebrow {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--acid); margin-bottom: 6px;
+}
+
+/* ---- cards ---- */
+.card {
+  background: linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px; margin: 16px 0;
+  position: relative; transition: border-color 0.18s, box-shadow 0.18s;
+}
+.card:hover { border-color: var(--border2); }
+.card.lit { border-color: rgba(182, 255, 58, 0.4); box-shadow: 0 0 0 1px var(--glow), 0 0 40px -18px var(--glow); }
+.stepnum {
+  position: absolute; top: 16px; right: 18px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px; color: var(--border2); font-weight: 700;
+}
+
+/* ---- buttons ---- */
+.btn {
+  background: var(--acid); color: #07080b; border: none;
+  border-radius: 10px; padding: 11px 18px; font-size: 12px;
+  cursor: pointer; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+  text-decoration: none; display: inline-block;
+  box-shadow: 0 0 24px -10px var(--glow); transition: transform 0.12s, box-shadow 0.18s;
+}
+.btn:hover { transform: translateY(-1px); box-shadow: 0 0 30px -8px var(--glow); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn.secondary {
+  background: transparent; border: 1px solid var(--border2); color: var(--text);
+  box-shadow: none;
+}
+.btn.secondary:hover { border-color: var(--acid); color: var(--acid); }
+
+/* ---- bits ---- */
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+.muted { color: var(--muted); }
+.row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.spread { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0; }
+
+.pill {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px; padding: 3px 10px; border-radius: 999px;
+  border: 1px solid var(--border2); color: var(--muted); letter-spacing: 0.06em;
+}
+.pill.on { color: var(--acid); border-color: rgba(182, 255, 58, 0.45); }
+
+input, select {
+  background: var(--bg2); border: 1px solid var(--border2); color: var(--text);
+  border-radius: 10px; padding: 11px 12px; font-size: 14px; width: 100%;
+  font-family: inherit;
+}
+input:focus, select:focus { outline: none; border-color: var(--acid); }
+label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* ---- table ---- */
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 11px 8px; border-bottom: 1px solid var(--border); font-size: 14px; }
+th { color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; font-size: 11px; }
+tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+.rank { font-family: ui-monospace, monospace; color: var(--acid); font-weight: 700; }
+.avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--border); object-fit: cover; border: 1px solid var(--border2); }
