@@ -77,9 +77,14 @@ const TTL_MS = 90_000;
 
 // Ranked by ATOM staked in the selected period (descending). Lifetime total is
 // read live from chain for the small secondary number.
-export async function buildLeaderboard(period: Period = "week"): Promise<LeaderboardRow[]> {
+// Pass { noCache: true } to force a fresh DB read (e.g. the share card, which
+// must reflect a just-made stake immediately).
+export async function buildLeaderboard(
+  period: Period = "week",
+  opts: { noCache?: boolean } = {}
+): Promise<LeaderboardRow[]> {
   const cached = cache.get(period);
-  if (cached && Date.now() - cached.at < TTL_MS) return cached.rows;
+  if (!opts.noCache && cached && Date.now() - cached.at < TTL_MS) return cached.rows;
 
   const { start, end } = getPeriodWindow(period);
   const where = start && end ? { createdAt: { gte: start, lt: end } } : {};

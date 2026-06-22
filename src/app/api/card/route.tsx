@@ -33,7 +33,8 @@ export async function GET(req: NextRequest) {
   const download = req.nextUrl.searchParams.get("download");
   if (!address) return new Response("address required", { status: 400 });
 
-  const rows = await buildLeaderboard();
+  // Fresh read so a just-made stake shows immediately (no stale cache).
+  const rows = await buildLeaderboard("week", { noCache: true });
   const me = rows.find((r) => r.cosmosAddress === address) || null;
 
   const rank = me?.rank ?? null;
@@ -180,9 +181,12 @@ export async function GET(req: NextRequest) {
     {
       width: 1200,
       height: 630,
-      headers: download
-        ? { "Content-Disposition": `attachment; filename="cosmos-fast-pass-rank.png"` }
-        : undefined,
+      headers: {
+        "Cache-Control": "no-store, max-age=0, must-revalidate",
+        ...(download
+          ? { "Content-Disposition": `attachment; filename="cosmos-fast-pass-rank.png"` }
+          : {}),
+      },
     }
   );
 }
