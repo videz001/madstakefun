@@ -158,3 +158,17 @@ th { color: var(--muted); font-weight: 600; text-transform: uppercase; letter-sp
 tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
 .rank { font-family: ui-monospace, monospace; color: var(--acid); font-weight: 700; }
 .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--border); object-fit: cover; border: 1px solid var(--border2); }
+
+/* Mascot in the left margin, below the ticker. Hidden when the viewport is too
+   narrow to hold it without overlapping the centered content. */
+.mascot {
+  position: fixed;
+  left: 28px;
+  top: 150px;
+  width: 180px;
+  height: auto;
+  z-index: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 0 30px rgba(182, 255, 58, 0.14));
+}
+@media (max-width: 1240px) { .mascot { display: none; } }

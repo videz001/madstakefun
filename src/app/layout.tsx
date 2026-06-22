@@ -23,6 +23,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/leaderboard">Leaderboard</Link>
           </nav>
           <Ticker />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="mascot" src="/mascot.png" alt="" />
           <div className="container">{children}</div>
         </Providers>
       </body>
