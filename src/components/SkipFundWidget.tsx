@@ -68,30 +68,29 @@ export function SkipFundWidget({
     }
   }, []);
 
-  // Set props once the custom element is defined (and whenever addresses change).
+  // Set props on the element. apiUrl FIRST so Skip's API client is configured to
+  // hit our same-origin proxy (avoids the go.skip.build CORS block). We re-apply
+  // on an interval for a few seconds so the value is in place both before and
+  // after the web component upgrades — otherwise it can start fetching the
+  // default (CORS-blocked) endpoint before our override lands.
   useEffect(() => {
-    let cancelled = false;
     const apply = () => {
       const el = ref.current;
       if (!el) return;
-      el.theme = widgetTheme;
-      // Route Skip's API calls through our own backend proxy to avoid CORS
-      // (go.skip.build's API is locked to Skip's own origin).
       el.apiUrl = `${window.location.origin}/api/skip`;
+      el.theme = widgetTheme;
       el.defaultRoute = { destChainId: CHAIN_ID, destAssetDenom: "uatom" };
       const connected: Record<string, string> = { [CHAIN_ID]: cosmosAddress };
       if (evmAddress) connected["1"] = evmAddress;
       el.connectedAddresses = connected;
     };
-    if (typeof window !== "undefined" && window.customElements) {
-      window.customElements.whenDefined("skip-widget").then(() => {
-        if (!cancelled) apply();
-      });
-      apply(); // in case it's already defined
-    }
-    return () => {
-      cancelled = true;
-    };
+    apply();
+    let n = 0;
+    const id = setInterval(() => {
+      apply();
+      if (++n > 30) clearInterval(id); // ~6s of coverage during script load/upgrade
+    }, 200);
+    return () => clearInterval(id);
   }, [cosmosAddress, evmAddress]);
 
   return (
