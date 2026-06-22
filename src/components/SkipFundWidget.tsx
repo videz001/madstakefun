@@ -56,6 +56,40 @@ export function SkipFundWidget({
 }) {
   const ref = useRef<any>(null);
 
+  // This version of the web component ignores the `apiUrl` prop and calls
+  // go.skip.build directly (CORS-blocked from our domain). So we patch fetch on
+  // this page and reroute those calls to our same-origin proxy at /api/skip.
+  // Installed before the widget script loads so its first request is caught.
+  useEffect(() => {
+    const SKIP_PREFIX = "https://go.skip.build/api/skip";
+    const proxyBase = `${window.location.origin}/api/skip`;
+    const orig = window.fetch.bind(window);
+
+    const rewrite = (u: string) =>
+      u.startsWith(SKIP_PREFIX) ? proxyBase + u.slice(SKIP_PREFIX.length) : u;
+
+    window.fetch = (input: any, init?: any) => {
+      try {
+        if (typeof input === "string" || input instanceof URL) {
+          const u = String(input);
+          if (u.startsWith(SKIP_PREFIX)) return orig(rewrite(u), init);
+        } else if (input && typeof input === "object" && "url" in input) {
+          // Request object
+          if (input.url.startsWith(SKIP_PREFIX)) {
+            return orig(new Request(rewrite(input.url), input), init);
+          }
+        }
+      } catch {
+        /* fall through to original */
+      }
+      return orig(input, init);
+    };
+
+    return () => {
+      window.fetch = orig;
+    };
+  }, []);
+
   // Load the web-component script once.
   useEffect(() => {
     if (!document.querySelector("script[data-skip-widget]")) {
