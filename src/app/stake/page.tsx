@@ -67,8 +67,11 @@ export default function StakePage() {
     const text =
       `I've staked ${amt} ATOM ${when} on Cosmos Hub` +
       (row?.rank ? ` and I'm ranked #${row.rank} ${when}` : "") +
-      ` on MAD STAKE FUN! ⚛️\n\nOne click from EVM into Cosmos — climb the board 👇`;
-    return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+      ` on madstake.fun ⚛️\n\nOne click from EVM into Cosmos — climb the board 👇`;
+    // Link to a share page whose OG image is the card — X unfurls it so the
+    // ranking card appears embedded in the tweet automatically.
+    const shareLink = `${window.location.origin}/share/${encodeURIComponent(me!.cosmosAddress!)}?period=${period}`;
+    return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareLink)}`;
   }
 
   return (
